@@ -1,0 +1,80 @@
+注意事项：
+docker下面运行：
+添加ai用户 否则有类似问题：https://github.com/oobabooga/text-generation-webui/issues/5064
+
+步骤：
+1.https://keykernel.org/2018/05/13/docker-run-in-user/
+2.# add user to `render` group
+sudo usermod -a -G render $USER
+# reload group stuff (otherwise it's as if you never added yourself to the group!)
+newgrp render
+
+3.在llama.cpp 目录运行：make clean && LLAMA_HIPBLAS=1 make -j  然后可以运行：HIP_VISIBLE_DEVICES=1 ./main -ngl 50 -m models/wizardcoder-python-34b/wizardcoder-python
+
+4.在llama.cpp/build/目录可以参考：https://confluence.amd.com/display/NAVI3XSTACK/LLama+2+CPP
+Build 
+mkdir build
+cd build
+CC=clang CXX=clang++ cmake -DLLAMA_HIPBLAS=ON -DCMAKE_BUILD_TYPE=Release -DAMDGPU_TARGETS=gfx1100 -DLLAMA_NATIVE=ON ..
+if you see issues with clang in this step; you can perform sudo apt-get install libstdc++-12-dev
+
+cmake --build . --config Release
+Run 
+go to llama.cpp/build/bin
+./llama-bench -m <PATH_TO_GGUF_FILE> -t 1 -ngl 20000
+example: ./llama-bench -m ../../llama-2-7b.Q4_0.gguf -t 1 -ngl 20000
+
+logs:
+
+在W7800 docker  ai用户下面运行的日志输出：
+
+ ./llama-bench -m ../../models/zephyr-7b-beta.Q2_K.gguf -t 1 -ngl 20000
+$ $ $ /home/git/llama.cpp.docker/build/bin
+$ ggml_cuda_init: GGML_CUDA_FORCE_MMQ:   no
+ggml_cuda_init: CUDA_USE_TENSOR_CORES: yes
+ggml_cuda_init: found 1 ROCm devices:
+  Device 0: AMD Radeon PRO W7800, compute capability 11.0, VMM: no
+| model                          |       size |     params | backend    | ngl |    threads |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ---------: | ------------: | ---------------: |
+main: error: failed to load model '../../llama-2-7b.Q4_0.gguf'
+$ ggml_cuda_init: GGML_CUDA_FORCE_MMQ:   no
+ggml_cuda_init: CUDA_USE_TENSOR_CORES: yes
+ggml_cuda_init: found 1 ROCm devices:
+  Device 0: AMD Radeon PRO W7800, compute capability 11.0, VMM: no
+| model                          |       size |     params | backend    | ngl |    threads |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ---------: | ------------: | ---------------: |
+| llama 7B Q2_K - Medium         |   2.87 GiB |     7.24 B | ROCm       | 20000 |          1 |         pp512 |   1167.76 ± 3.87 |
+| llama 7B Q2_K - Medium         |   2.87 GiB |     7.24 B | ROCm       | 20000 |          1 |         tg128 |     68.29 ± 0.14 |
+| llama 7B Q2_K - Medium         |   2.87 GiB |     7.24 B | ROCm       | 20000 |          1 |   pp512+tg128 |    268.98 ± 1.00 |
+
+
+
+ ./llama-bench -m ../../models/llama-2-7b.Q4_0.gguf -t 1 -ngl 20000
+
+ggml_cuda_init: CUDA_USE_TENSOR_CORES: yes
+ggml_cuda_init: found 1 ROCm devices:
+  Device 0: AMD Radeon PRO W7800, compute capability 11.0, VMM: no
+| model                          |       size |     params | backend    | ngl |    threads |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ---------: | ------------: | ---------------: |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       | 20000 |          1 |         pp512 |  1212.63 ± 11.70 |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       | 20000 |          1 |         tg128 |     74.39 ± 0.65 |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       | 20000 |          1 |   pp512+tg128 |    281.74 ± 0.45 |
+
+
+
+ ./llama-bench -m ../../models/llama-2-7b.Q4_0.gguf -t 1 -ngl 99
+
+
+$ $ ggml_cuda_init: GGML_CUDA_FORCE_MMQ:   no
+ggml_cuda_init: CUDA_USE_TENSOR_CORES: yes
+ggml_cuda_init: found 1 ROCm devices:
+  Device 0: AMD Radeon PRO W7800, compute capability 11.0, VMM: no
+| model                          |       size |     params | backend    | ngl |    threads |          test |              t/s |
+| ------------------------------ | ---------: | ---------: | ---------- | --: | ---------: | ------------: | ---------------: |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       |  99 |          1 |         pp512 |   1204.61 ± 7.37 |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       |  99 |          1 |         tg128 |     74.35 ± 0.08 |
+| llama 7B Q4_0                  |   3.56 GiB |     6.74 B | ROCm       |  99 |          1 |   pp512+tg128 |    281.41 ± 0.48 |
+
+
+
+
