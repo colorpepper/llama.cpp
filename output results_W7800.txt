@@ -1,8 +1,9 @@
-注意事项：
+# 注意事项：
 docker下面运行：
-添加ai用户 否则有类似问题：https://github.com/oobabooga/text-generation-webui/issues/5064
+1.docker 可以使用：docker pull rocm/pytorch:rocm6.0_ubuntu22.04_py3.9_pytorch_2.0.1
+2.添加ai用户 否则有类似问题：https://github.com/oobabooga/text-generation-webui/issues/5064
 
-步骤：
+# 步骤：
 1.https://keykernel.org/2018/05/13/docker-run-in-user/
 2.# add user to `render` group
 sudo usermod -a -G render $USER
@@ -24,7 +25,7 @@ go to llama.cpp/build/bin
 ./llama-bench -m <PATH_TO_GGUF_FILE> -t 1 -ngl 20000
 example: ./llama-bench -m ../../llama-2-7b.Q4_0.gguf -t 1 -ngl 20000
 
-logs:
+# logs:
 
 在W7800 docker  ai用户下面运行的日志输出：
 
@@ -77,4 +78,10 @@ ggml_cuda_init: found 1 ROCm devices:
 
 
 
+
+#  运行输入文字promt 给出output 文字
+/home/git/llama.cpp root@ea9fbce4f2fd:
+/home/git/llama.cpp# 
+export HSA_OVERRIDE_GFX_VERSION=11.0.0 && export HIP_VISIBLE_DEVICES=1 && sudo ./main -ngl 50 -m models/zephyr-7b-beta.Q2_K.gguf -p "How far does your knowledge of hyperplastic engineering go?"
+ 
 
