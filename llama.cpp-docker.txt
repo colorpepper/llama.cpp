@@ -1,4 +1,4 @@
 # docker 下面运行的提示（for Sky from RichPower）
 1. docker pull rocm/pytorch:rocm6.0_ubuntu22.04_py3.9_pytorch_2.0.1
-2. 解压并使用 llama.cpp_with_models.zip 文件 ,可以通过天翼云盘链接下载：https://cloud.189.cn/t/ZBRBFvQju2In （访问码：nd8c）（source code 位于：https://github.com/colorpepper/llama.cpp/tree/master）
+2. 解压并使用 llama.cpp_with_models.zip 文件 ,可以通过天翼云盘链接下载：https://cloud.189.cn/t/viuMVnna2Azq （访问码：3pz5）（source code 位于：https://github.com/colorpepper/llama.cpp/tree/master）
 3. 步骤参考 output results_W7800.txt 文件中的内容（涉及benchmark 和 实际输入prompt 给出output text 应用）
